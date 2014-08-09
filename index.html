@@ -57,8 +57,9 @@ var _currentattributes = [];
 var separateAxes = false;
 
 // stat.entityKilledBy.Creeper => Stat: Entity Killed By: Creeper
-function getStatName(statid) {
-	return toTitleCase(statid.replace(/_/g, " ").replace(/([A-Z])/g, ' $1').replace(/\./g, ": "));
+function getStatName(statid, shorter) {
+	shorter=shorter||statid;
+	return statnames[statid]||toTitleCase(shorter.replace(/_/g, " ").replace(/([A-Z])/g, ' $1').replace(/\./g, ": "));
 }
 
 // uppercase first letter of every word
@@ -67,6 +68,23 @@ function toTitleCase(str) {
 		return txt.charAt(0).toUpperCase() + txt.substr(1);
 	});
 }
+
+function getFormatter(statid) {
+	if(formatters[statid]) return function(){return formatters[statid](this.value);}
+	else return function(){return this.value;}
+}
+var formatters = {
+	"stat.playOneMinute": function(x){
+		x=x/20/60;
+		if(x<60) return (x|0)+" min";
+		x/=60;
+		if(x<24) return (x|0)+" h";
+		return ((x/24)|0)+" d, "+((x%24)|0)+" h";
+	}
+};
+var statnames = {
+	"stat.playOneMinute": "Play Time"
+};
 
 function statvalToDataval(stat, arr) {
 	if (stat === "achievement.exploreAllBiomes") return arr.map(function(x) {
@@ -173,6 +191,7 @@ function makechart(allusers, attributes, datainfo) {
 	var alldata = attributes.map(function(attribute, index) {
 		return {
 			name: getStatName(attribute),
+			stat: attribute,
 			data: statvalToDataval(attribute, datainfo.data[datainfo.attrs.indexOf(attribute)]),
 			yAxis: separateAxes ? index : 0
 		}
@@ -205,19 +224,28 @@ function makechart(allusers, attributes, datainfo) {
 				min: 0,
 				title: {
 					text: serie.name
-				}
+				},
+				labels: {formatter:getFormatter(serie.stat)},
 			}
-		}) : {
-			//labels: {formatter:function(){return this.value/20/60+"h";}},
+		}) : data.length != 1 ? {
 			min: 0,
 			title: {
 				text: "Count"
 			}
+		} : {
+			min: 0,
+			title: {
+				text: data[0].name,
+			},
+			labels: {formatter:getFormatter(data[0].stat)}
 		},
 		tooltip: {
-			headerFormat: '<span>{point.key}: </span><table style="border:1px">',
-			pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding-left:5px"><b>{point.y}</b></td></tr>',
-			footerFormat: '</table>',
+			formatter:function(){return this.points[0].key+
+				'<table>'+
+					this.points.map(function(point) {
+						return '<tr><td style="color:'+point.series.color+';padding:0">'+point.series.name+'</td><td style="padding-left:5px"><b>'+formatters[point.series.options.stat](point.y)+'</b></td></tr>'}).join("")+
+				'</table>'
+					;},
 			shared: true,
 			useHTML: true
 		},
@@ -248,7 +276,7 @@ function initdisplay(userdata, users) {
 		var prefix = attr.split(".")[0];
 		var suffix = attr.substring(prefix.length + 1);
 		opts[prefix] = opts[prefix] || $("<optgroup>").attr("label", getStatName(prefix));
-		$("<option>").val(attr).text(getStatName(suffix)).appendTo(opts[prefix]);
+		$("<option>").val(attr).text(getStatName(attr, suffix)).appendTo(opts[prefix]);
 	});
 	$("#options #separate").change(function() {
 		separateAxes = this.checked;

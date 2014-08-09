@@ -30,7 +30,7 @@ source: https://github.com/phiresky/minecraft-stats
 	<div id="options" role="form">
 		<div class="form-group">
 			<label for="attribute">Stats:</label>
-			<select multiple id="attribute" data-placeholder="Select a stat" class="form-control"><option> </option></select>
+			<select multiple id="attribute" data-placeholder="Select a stat" class="form-control"></select>
 		</div>
 		<div class="checkbox">
 			<label>
@@ -235,6 +235,7 @@ function makechart(allusers, attributes, datainfo) {
 
 function initdisplay(userdata, users) {
 	var data = parsedata(userdata);
+	if(data.attrs.length === 0) throw new Error("No Stats found");
 	var usernames = users.map(function(x) {
 		return x.name || x.id
 	});
@@ -258,7 +259,7 @@ function initdisplay(userdata, users) {
 		}))
 		.chosen()
 		.change(function() {
-			makechart(usernames, $(this).val(), data)
+			makechart(usernames, $(this).val()||[], data)
 		});
 	if (location.hash) {
 		var vals = location.hash.substr(1).split("+");

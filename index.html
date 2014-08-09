@@ -37,6 +37,9 @@ source: https://github.com/phiresky/minecraft-stats
 				<input type="checkbox" id="separate">Separate Axes
 			</label>
 		</div>
+		<div class="form-group">
+			<button id="random" class="btn btn-default">Random Stat</button>
+		</div>
 	</div>
 	<div id="chart"></div>
 	<h3 class="nonlight">All Stats</h3>
@@ -282,6 +285,11 @@ function initdisplay(userdata, users) {
 		separateAxes = this.checked;
 		makechart(usernames, _currentattributes, data);
 	});
+	function randomchart() {
+		var vals = [data.attrs[(Math.random() * data.attrs.length) | 0]];
+		makechart(usernames, vals, data);
+	}
+	$("#options #random").click(randomchart);
 	$("#options #attribute").append($.map(opts, function(v, k) {
 			return v;
 		}))
@@ -293,8 +301,7 @@ function initdisplay(userdata, users) {
 		var vals = location.hash.substr(1).split("+");
 		makechart(usernames, vals, data);
 	} else if (true || search.indexOf("random") >= 0) {
-		var vals = [data.attrs[(Math.random() * data.attrs.length) | 0]];
-		makechart(usernames, vals, data);
+		randomchart();
 	}
 
 }

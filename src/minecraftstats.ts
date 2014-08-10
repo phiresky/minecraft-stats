@@ -189,9 +189,7 @@ function makechart(allusers:string[], attributes:string[], datainfo:DataInfo) {
 			type: 'column'
 		},
 		title: {
-			text: data.map(function(serie) {
-				return serie.name
-			}).join(", ")
+			text: data.map(serie => serie.name).join(", ")
 		},
 		subtitle: {
 			text: 'Source: ' + config.servername
@@ -201,13 +199,17 @@ function makechart(allusers:string[], attributes:string[], datainfo:DataInfo) {
 		},
 		yAxis: axis,
 		tooltip: {
-			formatter:function(){return this.points[0].key+
+			formatter:function() {
+				return this.points[0].key +
 				'<table>'+
 					this.points.map((point:any) => {
 						var val = point.y;
 						var formatter = formatters[point.series.options.stat];
 						if(formatter) val = formatter(val);
-						return '<tr><td style="color:'+point.series.color+';padding:0">'+point.series.name+'</td><td style="padding-left:5px"><b>'+val+'</b></td></tr>'
+						return '<tr>'
+								+'<td style="color:'+point.series.color+';padding:0">'+point.series.name+'</td>'
+								+'<td style="padding-left:5px"><b>'+val+'</b></td>'
+							+'</tr>'
 					}).join("")+
 				'</table>'
 					;},

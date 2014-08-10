@@ -200,7 +200,7 @@ function makechart(allusers, attributes, datainfo) {
                     var formatter = formatters[point.series.options.stat];
                     if (formatter)
                         val = formatter(val);
-                    return '<tr><td style="color:' + point.series.color + ';padding:0">' + point.series.name + '</td><td style="padding-left:5px"><b>' + val + '</b></td></tr>';
+                    return '<tr>' + '<td style="color:' + point.series.color + ';padding:0">' + point.series.name + '</td>' + '<td style="padding-left:5px"><b>' + val + '</b></td>' + '</tr>';
                 }).join("") + '</table>';
             },
             shared: true,

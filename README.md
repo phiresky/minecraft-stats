@@ -5,9 +5,9 @@ Parses Vanilla Minecraft Server Statistics and displays graphs
 
 Screenshots
 ---
-Single Axis
+Separate Axes
 ![Screenshot1](https://i.imgur.com/P3NElME.png)
-Separate Axes and table
+Single Axis and table
 ![Screenshot2](https://i.imgur.com/fkRELBM.png)
 
 Usage

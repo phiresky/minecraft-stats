@@ -246,7 +246,10 @@ function makechart(allusers, attributes, datainfo) {
 			formatter:function(){return this.points[0].key+
 				'<table>'+
 					this.points.map(function(point) {
-						return '<tr><td style="color:'+point.series.color+';padding:0">'+point.series.name+'</td><td style="padding-left:5px"><b>'+formatters[point.series.options.stat](point.y)+'</b></td></tr>'}).join("")+
+						var val = point.y;
+						var formatter = formatters[point.series.options.stat];
+						if(formatter) val = formatter(val);
+						return '<tr><td style="color:'+point.series.color+';padding:0">'+point.series.name+'</td><td style="padding-left:5px"><b>'+val+'</b></td></tr>'}).join("")+
 				'</table>'
 					;},
 			shared: true,

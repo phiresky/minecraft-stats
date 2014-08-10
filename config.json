@@ -1,0 +1,6 @@
+{
+	usercachepath: "usercache.json", // file containing user uuid/name array, usually /data/usercache.json
+	statspath: "stats/", // path containing the {uuid}.json files, usually from /data/world/stats
+	servername: "Minecraft Server",
+	userMinimumOntime: 10*60, // ignore users that were on less than x seconds
+}

@@ -57,11 +57,9 @@ function parsedata(userdata) {
             data[inx][i] = user[attr];
         }
     }
-    // sort data (TODO: less bullshitty solution
-    attrs.forEach(function (e, i) {
-        data[i]._sort = e;
-    });
-    attrs = attrs.sort();
+    // sort data (TODO: less bullshitty solution)
+    attrs.forEach(function (e, i) { return data[i]._sort = e; });
+    attrs = attrs.sort(function (a, b) { return a.localeCompare(b); });
     data = data.sort(function (a, b) { return a._sort.localeCompare(b._sort); });
     return {
         data: data,

@@ -78,11 +78,9 @@ function parsedata(userdata:{[statid:string]:any}[]) {
 		}
 	}
 
-	// sort data (TODO: less bullshitty solution
-	attrs.forEach(function(e, i) {
-		(<any>data[i])._sort = e
-	});
-	attrs = attrs.sort();
+	// sort data (TODO: less bullshitty solution)
+	attrs.forEach((e, i) => (<any>data[i])._sort = e);
+	attrs = attrs.sort((a,b) => a.localeCompare(b));
 	data = data.sort((a:any, b:any) => a._sort.localeCompare(b._sort));
 	return {
 		data: data,

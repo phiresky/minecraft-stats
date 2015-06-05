@@ -6,29 +6,20 @@ var gottencount = 0;
 var _currentattributes = [], _usernames, _data;
 var separateAxes = false;
 var config;
-
 // stat.entityKilledBy.Creeper => Stat: Entity Killed By: Creeper
 function getStatName(statid, shorter) {
-    if (typeof shorter === "undefined") { shorter = statid; }
+    if (shorter === void 0) { shorter = statid; }
     return statnames[statid] || toTitleCase(shorter.replace(/_/g, " ").replace(/([A-Z])/g, ' $1').replace(/\./g, ": "));
 }
-
 // uppercase first letter of every word
 function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1);
-    });
+    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1); });
 }
-
 function getFormatter(statid) {
     if (formatters[statid])
-        return function () {
-            return formatters[statid](this.value);
-        };
+        return function () { return formatters[statid](this.value); };
     else
-        return function () {
-            return this.value;
-        };
+        return function () { return this.value; };
 }
 var formatters = {
     "stat.playOneMinute": function (x) {
@@ -44,15 +35,11 @@ var formatters = {
 var statnames = {
     "stat.playOneMinute": "Play Time"
 };
-
 function statvalToDataval(stat, arr) {
     if (stat === "achievement.exploreAllBiomes")
-        return arr.map(function (x) {
-            return x.progress.length;
-        });
+        return arr.map(function (x) { return x.progress.length; });
     return arr;
 }
-
 // convert data from minecraft json to 2d [stat][user] array and stat name array
 function parsedata(userdata) {
     var data = [];
@@ -70,47 +57,46 @@ function parsedata(userdata) {
             data[inx][i] = user[attr];
         }
     }
-
     // sort data (TODO: less bullshitty solution
     attrs.forEach(function (e, i) {
         data[i]._sort = e;
     });
     attrs = attrs.sort();
-    data = data.sort(function (a, b) {
-        return a._sort.localeCompare(b._sort);
-    });
+    data = data.sort(function (a, b) { return a._sort.localeCompare(b._sort); });
     return {
         data: data,
         attrs: attrs
     };
 }
-
 function maketable(users, data) {
     var headers = $("<tr>");
     $("<th class='firstcolumn'>Eigenschaft</th>").appendTo(headers);
-    users.forEach(function (user) {
-        return $("<th>").text(user).appendTo(headers);
-    });
+    users.forEach(function (user) { return $("<th>").text(user).appendTo(headers); });
     var table = $("<table class='table table-bordered table-striped'>").append(headers);
     var ins = [];
     var prefixExisting = {};
     data.data.forEach(function (row, i) {
         var attr = data.attrs[i];
-        var dotIndex = attr.indexOf("."), lastDotIndex = 0;
+        var dotIndex = attr.indexOf("."), lastDotIndex = -1;
         var prefix = "", lastprefix = "";
         while (dotIndex >= 0) {
             prefix = attr.substr(0, dotIndex);
             if (!prefixExisting[prefix]) {
                 prefixExisting[prefix] = true;
                 var statname = getStatName(attr.substring(lastDotIndex + 1, dotIndex));
-                ins.push($("<tr><td>" + statname + "</td></tr>").attr("data-tt-id", prefix).attr("data-tt-parent-id", lastprefix));
+                ins.push($("<tr><td>" + statname + "</td></tr>")
+                    .attr("data-tt-id", prefix)
+                    .attr("data-tt-parent-id", lastprefix));
             }
             lastDotIndex = dotIndex;
             dotIndex = attr.indexOf(".", dotIndex + 1);
             lastprefix = prefix;
         }
-
-        ins.push($("<tr>").attr("data-tt-parent-id", prefix).attr("data-tt-id", attr).attr("id", "attr-" + attr).click(function () {
+        ins.push($("<tr>")
+            .attr("data-tt-parent-id", prefix)
+            .attr("data-tt-id", attr)
+            .attr("id", "attr-" + attr)
+            .click(function () {
             var attr = $(this).data("ttId");
             var attrs = _currentattributes.slice();
             var inx = attrs.indexOf(attr);
@@ -119,7 +105,9 @@ function maketable(users, data) {
             else
                 attrs.push(attr);
             makechart(_usernames, attrs, _data);
-        }).append($("<td>").text(getStatName(attr.substr(lastDotIndex + 1)))).append(statvalToDataval(attr, row).map(function (val) {
+        })
+            .append($("<td>").text(getStatName(attr.substr(lastDotIndex + 1))))
+            .append(statvalToDataval(attr, row).map(function (val) {
             return $("<td>").text(val);
         })));
     });
@@ -130,7 +118,6 @@ function maketable(users, data) {
     });
     return table;
 }
-
 function makechart(allusers, attributes, datainfo) {
     $("#attribute").val(attributes).trigger("chosen:updated");
     attributes = attributes || [];
@@ -151,15 +138,13 @@ function makechart(allusers, attributes, datainfo) {
             yAxis: separateAxes ? index : 0
         };
     });
-
     // remove users without stats
-    var users = allusers, data = alldata;
-
+    var users = allusers, data = alldata; // = [], =[]
     //for(var i=0;i<alldata.length;i++) {
     //	if(alldata[i]!==undefined) { users.push(allusers[i]); data.push(alldata[i]); }
     //}
     function getAxis(title, formatter) {
-        if (typeof title === "undefined") { title = "Count"; }
+        if (title === void 0) { title = "Count"; }
         var x = {
             min: 0,
             title: { text: title }
@@ -171,20 +156,15 @@ function makechart(allusers, attributes, datainfo) {
     ;
     var axis = getAxis();
     if (separateAxes)
-        axis = data.map(function (serie) {
-            return getAxis(serie.name, getFormatter(serie.stat));
-        });
+        axis = data.map(function (serie) { return getAxis(serie.name, getFormatter(serie.stat)); });
     else if (data.length == 1)
         axis = getAxis(data[0].name, getFormatter(data[0].stat));
-
     $('#chart').highcharts({
         chart: {
             type: 'column'
         },
         title: {
-            text: data.map(function (serie) {
-                return serie.name;
-            }).join(", ")
+            text: data.map(function (serie) { return serie.name; }).join(", ")
         },
         subtitle: {
             text: 'Source: ' + config.servername
@@ -195,13 +175,19 @@ function makechart(allusers, attributes, datainfo) {
         yAxis: axis,
         tooltip: {
             formatter: function () {
-                return this.points[0].key + '<table>' + this.points.map(function (point) {
-                    var val = point.y;
-                    var formatter = formatters[point.series.options.stat];
-                    if (formatter)
-                        val = formatter(val);
-                    return '<tr>' + '<td style="color:' + point.series.color + ';padding:0">' + point.series.name + '</td>' + '<td style="padding-left:5px"><b>' + val + '</b></td>' + '</tr>';
-                }).join("") + '</table>';
+                return this.points[0].key +
+                    '<table>' +
+                    this.points.map(function (point) {
+                        var val = point.y;
+                        var formatter = formatters[point.series.options.stat];
+                        if (formatter)
+                            val = formatter(val);
+                        return '<tr>'
+                            + '<td style="color:' + point.series.color + ';padding:0">' + point.series.name + '</td>'
+                            + '<td style="padding-left:5px"><b>' + val + '</b></td>'
+                            + '</tr>';
+                    }).join("") +
+                    '</table>';
             },
             shared: true,
             useHTML: true
@@ -216,7 +202,6 @@ function makechart(allusers, attributes, datainfo) {
         series: data
     });
 }
-
 function initdisplay(userdata, users) {
     var data = parsedata(userdata);
     if (data.attrs.length === 0)
@@ -245,17 +230,19 @@ function initdisplay(userdata, users) {
     $("#options #random").click(randomchart);
     $("#options #attribute").append($.map(opts, function (v, k) {
         return v;
-    })).chosen().change(function () {
+    }))
+        .chosen()
+        .change(function () {
         makechart(usernames, $(this).val() || [], data);
     });
     if (location.hash) {
         var vals = location.hash.substr(1).split("+");
         makechart(usernames, vals, data);
-    } else if (true || search.indexOf("random") >= 0) {
+    }
+    else if (true || search.indexOf("random") >= 0) {
         randomchart();
     }
 }
-
 var search = [];
 $(function () {
     $.getJSON("config.json", function (x) {
@@ -270,17 +257,17 @@ $(function () {
             var users = [];
             for (var u = 0; u < r.length; u++) {
                 var user = r[u];
-
                 function getresp(user, resp) {
                     if (resp['stat.playOneMinute'] < 20 * config.userMinimumOntime)
                         return;
                     userdata.push(resp);
                     users.push(user);
                 }
-
-                $.getJSON(config.statspath + user.uuid + ".json", getresp.bind(null, user)).fail(function () {
+                $.getJSON(config.statspath + user.uuid + ".json", getresp.bind(null, user))
+                    .fail(function () {
                     console.log("user " + user.name + " not found");
-                }).always(function () {
+                })
+                    .always(function () {
                     gottencount++;
                     if (gottencount == targetcount) {
                         if (gottencount === 0)

@@ -100,7 +100,7 @@ function maketable(users:string[], data:DataInfo) {
 	data.data.forEach(function(row, i) {
 		var attr = data.attrs[i];
 		var dotIndex = attr.indexOf("."),
-			lastDotIndex = 0;
+			lastDotIndex = -1;
 		var prefix = "", lastprefix = "";
 		while (dotIndex >= 0) {
 			prefix = attr.substr(0, dotIndex);
